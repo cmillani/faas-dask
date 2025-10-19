@@ -1,0 +1,60 @@
+[build-system]
+requires = ['setuptools', 'setuptools-scm[toml]']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'faascheduler'
+authors = [
+    {name = 'Carlos Eduardo Millani', email = 'carloseduardomillani@gmail.com'},
+]
+description = 'Exemplo de implementação de API REST em Python'
+readme = 'README.md'
+requires-python = '>=3.10'
+classifiers = [
+    'Programming Language :: Python :: 3',
+]
+dependencies = [ 
+    # urllib3 limitation added because of boto3 lambda compatibility, boto3 and botocore locked for same reason
+    # see https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+    'dask[array]', 'zarr', 'scipy', 'urllib3<2', 'boto3==1.26.90', 'botocore==1.29.90', 'pysqlite3-binary==0.5.4'
+]
+dynamic = ['version']
+
+[tool.setuptools.packages.find]
+where = ['.']  # list of folders that contain the packages (['.'] by default)
+include = ['faascheduler', 'faascheduler.*']  # package names should match these glob patterns (['*'] by default)
+
+[project.optional-dependencies]
+dev = ['pytest', 'pytest-cov', 'mypy', 'ruff', 'build', 'pip-tools', 'boto3-stubs[essential,logs,ce]', 
+        'pika-stubs', 'pandas-stubs']
+aws = ['boto3==1.26.90', 'botocore==1.29.90', 's3fs']
+
+[tool.pip-tools]
+generate-hashes = true
+emit_index_url = false
+
+[tool.ruff]
+line-length = 120
+extend-include = ["src/**/*.ipynb"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+files = '.'
+show_error_codes = true
+follow_imports = 'normal'
+disallow_untyped_defs = true
+disallow_any_unimported = true
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts= '--cov=faascheduler --junitxml=junit/test-results.xml --cov-report=xml --cov-report=html'
+testpaths=['tests']
+
+[tool.setuptools_scm] # Needed to enable setuptools_scm
+
